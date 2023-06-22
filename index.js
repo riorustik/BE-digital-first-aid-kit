@@ -18,7 +18,7 @@ const PostController = require("./controllers/PostControllers");
 const app = express();
 app.use(express.json());
 mongoose
-     .connect("mongodb+srv://rustamavatar:z85YqqmxxKtH2i30@cluster0.bhd86mm.mongodb.net/test?retryWrites=true&w=majority",)
+     .connect("mongodb+srv://***@cluster0.bhd86mm.mongodb.net/test?retryWrites=true&w=majority",)
     .then(() => console.log("DB OK!"))
     .catch((err) => console.log("DB ERR", err));
 app.use(cors());
