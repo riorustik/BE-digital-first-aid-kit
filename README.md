@@ -18,7 +18,7 @@ mongoose
   app.post('/auth/login', loginValidation, handleValidationError, UserControllers.login);
   app.post('/auth/register', registerValidation, handleValidationError, UserControllers.registr);
 ```
-Функция создания токена с помощью библиотеки "jsonwebtoken"
+Функция проверки токена с помощью библиотеки "jsonwebtoken"
 ```
 exports.checkAuth = (req, res, next) => {
     const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
@@ -71,6 +71,7 @@ module.exports = model('User', UserSchema);
 
 Функция регистрации пользователя
 >Функция шифрует пароли с помощью библиотеки "bcrypt"
+>Функция создает токен доступа для пользователя с помощью библиотеки "jsonwebtoken"
 ```
 exports.registr =  async (req, res) => {
     try {
