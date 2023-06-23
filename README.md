@@ -4,7 +4,7 @@
 
 Проект написан с использованием технологии **`Node`** **`Express`** базой данных **`MongoDB`**
 
-Серверная часть проекта включает в себя, модели схем документов базы данных, контроллеры, файлы валидации.
+Серверная часть проекта включает в себя, модели схем коллекций базы данных, контроллеры, файлы валидации.
 
 Подлючение к базе данных 
 ```
@@ -140,6 +140,86 @@ exports.registr =  async (req, res) => {
         console.log(err)
         res.status(500).json({
             message: 'Не удалось зарегистрироваться!'
+        })
+    }
+}
+```
+
+Схема коллекции аптечки пользователя
+```
+const PharmacySchema = new mongoose.Schema({
+    medicines: [
+        new mongoose.Schema({
+            title: {type: String,},
+            expiratioDate:{type: Date,},
+            dosageForm:{type: String,},
+            medicine: {type: mongoose.Schema.Types.ObjectId, ref: 'Medicine',}
+        })
+    ],
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true,},
+}, {
+    timestamps: true,
+});
+```
+Функция добавления препарата в аптечку
+```
+exports.insert = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const test = req.body.title.toLowerCase();
+        const rez = await MedicineModel.findOne({
+            fullname: test
+        });
+        if(rez){
+            await PharmacyModel.updateOne({
+                    _id: postId,
+                },
+                {
+                    $push:{
+                        medicines: {
+                            title: test,
+                            expiratioDate: req.body.expiratioDate,
+                            dosageForm: req.body.dosageForm,
+                            medicine: rez._id,
+                        },
+                    }
+                },
+            );
+        }else {
+
+            const ff = req.body.title.toLowerCase();
+            const doc = new MedicineModel({
+                fullname: ff,
+                dosageForm: req.body.dosageForm,
+            });
+            const medicine = await doc.save();
+
+            const {...medicineData} = medicine._doc;
+
+            await PharmacyModel.updateOne({
+                    _id: postId,
+                },
+                {
+                    $push:{
+                        medicines: {
+                            title: test,
+                            expiratioDate: req.body.expiratioDate,
+                            dosageForm: req.body.dosageForm,
+                            medicine: medicineData._id,
+                        },
+                    }
+                },
+            );
+        }
+
+       res.json({
+            success: true,
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: 'Не удалось добавать препарат в атечку!'
         })
     }
 }
